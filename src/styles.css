@@ -82,3 +82,12 @@ h1 { font-size: clamp(36px, 10vw, 54px); line-height: .92; margin: 0 0 22px; let
   h1 { font-size: 38px; }
   .content, .intro, .result { padding: 24px; }
 }
+
+.shareNote {
+  max-width: 280px;
+  margin: 4px auto 10px;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  text-align: center;
+  opacity: 0.85;
+}
