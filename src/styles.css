@@ -4,12 +4,31 @@
   background: #140b12;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-body { margin: 0; min-width: 320px; min-height: 100vh; }
+html,
+body,
+#root {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100%;
+}
 
-button, a { font: inherit; }
-button { border: 0; cursor: pointer; }
+body {
+  min-height: 100vh;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+}
 
 .page {
   min-height: 100vh;
@@ -17,9 +36,9 @@ button { border: 0; cursor: pointer; }
   place-items: center;
   padding: 18px;
   background:
-    radial-gradient(circle at 20% 15%, rgba(255, 196, 112, .42), transparent 25%),
-    radial-gradient(circle at 80% 20%, rgba(255, 88, 166, .42), transparent 30%),
-    radial-gradient(circle at 50% 100%, rgba(90, 216, 190, .30), transparent 35%),
+    radial-gradient(circle at 20% 15%, rgba(255, 196, 112, 0.42), transparent 25%),
+    radial-gradient(circle at 80% 20%, rgba(255, 88, 166, 0.42), transparent 30%),
+    radial-gradient(circle at 50% 100%, rgba(90, 216, 190, 0.3), transparent 35%),
     #140b12;
 }
 
@@ -29,58 +48,170 @@ button { border: 0; cursor: pointer; }
   min-height: 680px;
   border-radius: 36px;
   overflow: hidden;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.22);
-  box-shadow: 0 28px 90px rgba(0,0,0,.42);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
   position: relative;
 }
 
-.screen { position: absolute; inset: 0; overflow: hidden; }
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
 
-.intro, .result {
+.intro,
+.result {
   padding: 34px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   background:
-    linear-gradient(145deg, rgba(255, 105, 180, .85), rgba(255, 189, 89, .35)),
-    radial-gradient(circle at top, rgba(255,255,255,.28), transparent 42%),
+    linear-gradient(145deg, rgba(255, 105, 180, 0.85), rgba(255, 189, 89, 0.35)),
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.28), transparent 42%),
     #25111f;
 }
 
-.sparkle, .resultEmoji { font-size: 72px; margin-bottom: 22px; }
-.eyebrow { text-transform: uppercase; letter-spacing: .16em; font-size: 12px; font-weight: 800; opacity: .78; margin: 0 0 12px; }
+.sparkle,
+.resultEmoji {
+  font-size: 72px;
+  margin-bottom: 22px;
+}
 
-h1 { font-size: clamp(36px, 10vw, 54px); line-height: .92; margin: 0 0 22px; letter-spacing: -.06em; }
-.subcopy { font-size: 18px; line-height: 1.45; opacity: .9; margin: 0 0 30px; }
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 12px;
+  font-weight: 800;
+  opacity: 0.78;
+  margin: 0 0 12px;
+}
 
-.primary, .secondary, .answers button {
+h1 {
+  font-size: clamp(36px, 10vw, 54px);
+  line-height: 0.92;
+  margin: 0 0 22px;
+  letter-spacing: -0.06em;
+}
+
+.subcopy {
+  font-size: 18px;
+  line-height: 1.45;
+  opacity: 0.9;
+  margin: 0 0 30px;
+}
+
+.primary,
+.secondary,
+.answers button {
   width: 100%;
   border-radius: 999px;
   padding: 16px 18px;
   font-weight: 900;
-  transition: transform .16s ease, background .16s ease;
+  transition: transform 0.16s ease, background 0.16s ease;
 }
-.primary { background: #fff; color: #140b12; }
-.secondary { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.24); margin-top: 12px; }
-.primary:hover, .secondary:hover, .answers button:hover { transform: translateY(-2px); }
-.linkButton { display: inline-block; text-align: center; text-decoration: none; }
 
-.bgVideo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: linear-gradient(145deg, #3b1b31, #d96983); }
-.shade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.16), rgba(0,0,0,.22) 38%, rgba(0,0,0,.84)); }
-.content { position: absolute; inset: 0; padding: 28px; display: flex; flex-direction: column; justify-content: flex-end; }
-.topbar { display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; opacity: .85; margin-bottom: 10px; }
-.progressTrack { height: 7px; border-radius: 999px; background: rgba(255,255,255,.24); overflow: hidden; margin-bottom: auto; }
-.progressFill { height: 100%; border-radius: 999px; background: white; transition: width .25s ease; }
-.quiz h1 { font-size: clamp(32px, 9vw, 48px); margin-top: 32px; text-shadow: 0 4px 28px rgba(0,0,0,.4); }
-.answers { display: grid; gap: 12px; }
-.answers button { background: rgba(255,255,255,.92); color: #140b12; backdrop-filter: blur(10px); }
-.ig { color: #fff; text-align: center; margin-top: 18px; font-size: 14px; font-weight: 800; opacity: .9; }
+.primary {
+  background: #fff;
+  color: #140b12;
+}
 
-@media (max-height: 720px) {
-  .phone { min-height: 620px; }
-  h1 { font-size: 38px; }
-  .content, .intro, .result { padding: 24px; }
+.secondary {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  margin-top: 12px;
+}
+
+.primary:hover,
+.secondary:hover,
+.answers button:hover {
+  transform: translateY(-2px);
+}
+
+.linkButton {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.bgVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: linear-gradient(145deg, #3b1b31, #d96983);
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.16),
+    rgba(0, 0, 0, 0.22) 38%,
+    rgba(0, 0, 0, 0.84)
+  );
+}
+
+.content {
+  position: absolute;
+  inset: 0;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 800;
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+
+.progressTrack {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.24);
+  overflow: hidden;
+  margin-bottom: auto;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 999px;
+  background: white;
+  transition: width 0.25s ease;
+}
+
+.quiz h1 {
+  font-size: clamp(32px, 9vw, 48px);
+  margin-top: 32px;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.4);
+}
+
+.answers {
+  display: grid;
+  gap: 12px;
+}
+
+.answers button {
+  background: rgba(255, 255, 255, 0.92);
+  color: #140b12;
+  backdrop-filter: blur(10px);
+}
+
+.ig {
+  color: #fff;
+  text-align: center;
+  margin-top: 18px;
+  font-size: 14px;
+  font-weight: 800;
+  opacity: 0.9;
 }
 
 .shareNote {
@@ -90,4 +221,110 @@ h1 { font-size: clamp(36px, 10vw, 54px); line-height: .92; margin: 0 0 22px; let
   line-height: 1.35;
   text-align: center;
   opacity: 0.85;
+}
+
+@media (max-height: 720px) and (min-width: 601px) {
+  .phone {
+    min-height: 620px;
+  }
+
+  h1 {
+    font-size: 38px;
+  }
+
+  .content,
+  .intro,
+  .result {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  .page {
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    padding: 0;
+    display: block;
+    overflow: hidden;
+  }
+
+  .phone {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .screen {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .screen.quiz {
+    overflow: hidden;
+  }
+
+  .quiz .content {
+    height: 100%;
+    padding:
+      calc(14px + env(safe-area-inset-top))
+      18px
+      calc(16px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .topbar {
+    flex: 0 0 auto;
+    margin-bottom: 8px;
+  }
+
+  .progressTrack {
+    flex: 0 0 auto;
+    margin-bottom: 0;
+  }
+
+  .quiz h1 {
+    flex: 0 1 auto;
+    margin: 16px 0 12px;
+    font-size: clamp(23px, 7vw, 34px);
+    line-height: 1.05;
+  }
+
+  .answers {
+    margin-top: auto;
+    display: grid;
+    gap: 9px;
+  }
+
+  .answers button {
+    padding: 11px 14px;
+    min-height: 0;
+    font-size: 15px;
+    line-height: 1.15;
+  }
+
+  .intro,
+  .result {
+    padding:
+      calc(24px + env(safe-area-inset-top))
+      24px
+      calc(24px + env(safe-area-inset-bottom));
+  }
 }
