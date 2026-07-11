@@ -194,24 +194,35 @@ const initialScores = {
 
 
 function getWinner(scores) {
-  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1])
-  const [topType, topScore] = sorted[0]
-  const [secondType, secondScore] = sorted[1]
+  const highestScore = Math.max(...Object.values(scores))
 
-  // Mostly strawberry, but spicy enough to change the vibe
-  if (topType === 'strawberry' && scores.spicy >= 2) {
+  const tiedTypes = Object.entries(scores)
+    .filter(([, score]) => score === highestScore)
+    .map(([type]) => type)
+
+  // Strawberry + enough Spicy becomes Sunset.
+  if (
+    tiedTypes.includes('strawberry') &&
+    scores.spicy >= 2
+  ) {
     return 'sunset'
   }
 
-  // Mostly spicy, but strawberry enough to make it romantic-chaotic
-  if (topType === 'skinny' && scores.spicy > 3) {
+  // Rare unicorn result: Skinny must be at the top
+  // and Spicy must have more than 3 points.
+  if (
+    tiedTypes.includes('skinny') &&
+    scores.spicy > 3
+  ) {
     return 'sparkling'
   }
 
-
-  return topType
+  // Choose randomly among tied top scores instead of
+  // always favoring Skinny because it appears first.
+  return tiedTypes[
+    Math.floor(Math.random() * tiedTypes.length)
+  ]
 }
-
 
 
 export default function App() {
@@ -358,7 +369,8 @@ link.remove()
   onClick={shareResult}
   style={{ marginTop: '24px' }}
 >
-  Share my result 📸
+  Share my result 
+  (don't forget to tag @aspenjade.vox)📸
 </button>
 
    {/* <button className="secondary" onClick={restart}>
