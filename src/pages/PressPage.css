@@ -1,0 +1,647 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+.skinnyExperience {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  overflow: hidden;
+  place-items: center;
+  color: #111111;
+  background: #72cce8;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.skinnyExperience *,
+.skinnyExperience *::before,
+.skinnyExperience *::after {
+  box-sizing: border-box;
+}
+
+.skinnyExperience button,
+.skinnyExperience input {
+  font: inherit;
+}
+
+/* Background video */
+
+.skinnyBackground {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.skinnyVideoTint {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.02),
+      rgba(114, 204, 232, 0.1) 65%,
+      rgba(240, 128, 223, 0.14)
+    );
+}
+
+.skinnyGrain {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  opacity: 0.05;
+  pointer-events: none;
+  background-image:
+    repeating-radial-gradient(
+      circle,
+      rgba(0, 0, 0, 0.4) 0,
+      rgba(0, 0, 0, 0.4) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+}
+
+/* Main composition */
+
+.skinnyMainContent {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  width: min(720px, calc(100% - 24px));
+  min-height: 100svh;
+  padding: 28px 0 24px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.skinnyMainLogo {
+  position: relative;
+  z-index: 5;
+  display: block;
+  width: min(980px, 112vw);
+  max-width: none;
+  height: auto;
+  margin: 0 0 -122px;
+  transform: translateX(-18px);
+  pointer-events: none;
+}
+
+/* Disc */
+
+.skinnyDisc {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  width: min(330px, 72vw);
+  aspect-ratio: 1;
+  padding: 0;
+  place-items: center;
+  border: 7px solid #111111;
+  border-radius: 50%;
+  color: #111111;
+  background: transparent;
+  box-shadow: 12px 12px 0 #111111;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.skinnyDisc:hover {
+  transform: scale(1.025);
+}
+
+.skinnyDisc:active {
+  transform: translate(7px, 7px) scale(0.99);
+  box-shadow: 5px 5px 0 #111111;
+}
+
+.skinnyDiscArtwork {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      from 0deg,
+      #f080df,
+      #ea70d8 16%,
+      #72cce8 17%,
+      #f080df 32%,
+      #bfd348 33%,
+      #f080df 49%,
+      #72cce8 50%,
+      #f080df 66%,
+      #bfd348 67%,
+      #f080df 83%,
+      #72cce8 84%,
+      #f080df
+    );
+}
+
+.skinnyDiscArtwork::before {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    repeating-radial-gradient(
+      circle,
+      transparent 0,
+      transparent 14px,
+      rgba(17, 17, 17, 0.14) 15px,
+      rgba(17, 17, 17, 0.14) 18px,
+      transparent 19px,
+      transparent 30px
+    );
+  content: '';
+}
+
+.skinnyDiscPlaying .skinnyDiscArtwork {
+  animation: skinnyDiscSpin 4.5s linear infinite;
+}
+
+.skinnyDiscRing {
+  position: absolute;
+  border: 3px solid rgba(17, 17, 17, 0.36);
+  border-radius: 50%;
+}
+
+.skinnyDiscRingOne {
+  inset: 10%;
+}
+
+.skinnyDiscRingTwo {
+  inset: 25%;
+}
+
+.skinnyDiscRingThree {
+  inset: 40%;
+  background: #f080df;
+}
+
+.skinnyDiscControl {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  width: 126px;
+  height: 126px;
+  padding: 13px;
+  place-items: center;
+  border: 6px solid #111111;
+  border-radius: 50%;
+  background: #bfd348;
+  box-shadow: 7px 7px 0 #111111;
+}
+
+.skinnyDiscIcon {
+  display: grid;
+  height: 46px;
+  place-items: center;
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.skinnyDiscInstruction {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+/* Progress */
+
+.skinnyProgressSection {
+  position: relative;
+  width: min(420px, 86vw);
+  margin-top: 30px;
+}
+
+.skinnyProgressBar {
+  height: 24px;
+  overflow: hidden;
+  border: 5px solid #111111;
+  border-radius: 999px;
+  background: #f7f1e5;
+  box-shadow: 5px 5px 0 #111111;
+}
+
+.skinnyProgressValue {
+  height: 100%;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      #f080df 0,
+      #f080df 14px,
+      #72cce8 14px,
+      #72cce8 28px
+    );
+}
+
+.skinnyProgressInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.skinnyProgressTimes {
+  display: flex;
+  margin-top: 12px;
+  justify-content: space-between;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* Lyrics button */
+
+.skinnyLyricsButton {
+  margin-top: 19px;
+  padding: 10px 17px;
+  border: 4px solid #111111;
+  border-radius: 999px;
+  color: #111111;
+  background: #f080df;
+  box-shadow: 4px 4px 0 #111111;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.skinnyLyricsButton:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 #111111;
+}
+
+.skinnyAudioError {
+  margin: 16px 0 0;
+  padding: 9px 13px;
+  border: 3px solid #111111;
+  border-radius: 12px;
+  background: #f7f1e5;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* Floating lyrics */
+
+.skinnyStickerLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.skinnyLyricSticker {
+  position: absolute;
+  padding: 10px 15px;
+  border: 4px solid #111111;
+  border-radius: 17px;
+  color: #111111;
+  background: #bfd348;
+  box-shadow: 5px 5px 0 #111111;
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(0.62rem, 1.4vw, 0.88rem);
+  font-weight: 700;
+  white-space: nowrap;
+  animation: skinnyStickerFloat 5s ease-in-out infinite alternate;
+}
+
+.skinnyStickerOne {
+  top: 16%;
+  left: 5%;
+  transform: rotate(-7deg);
+}
+
+.skinnyStickerTwo {
+  top: 27%;
+  right: 5%;
+  background: #72cce8;
+  transform: rotate(7deg);
+  animation-delay: -2s;
+}
+
+.skinnyStickerThree {
+  bottom: 18%;
+  left: 4%;
+  background: #f080df;
+  transform: rotate(5deg);
+  animation-delay: -4s;
+}
+
+.skinnyStickerFour {
+  right: 4%;
+  bottom: 13%;
+  transform: rotate(-7deg);
+  animation-delay: -1s;
+}
+
+/* Decorative bubbles */
+
+.skinnyDecorations {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.skinnyBubble {
+  position: absolute;
+  border: 4px solid #111111;
+  border-radius: 50%;
+  background: #f080df;
+  animation: skinnyBubbleFloat 5s ease-in-out infinite alternate;
+}
+
+.skinnyBubbleOne {
+  top: 10%;
+  right: 18%;
+  width: 30px;
+  height: 30px;
+}
+
+.skinnyBubbleTwo {
+  right: 8%;
+  bottom: 29%;
+  width: 48px;
+  height: 48px;
+  background: #bfd348;
+  animation-delay: -2s;
+}
+
+.skinnyBubbleThree {
+  bottom: 24%;
+  left: 10%;
+  width: 24px;
+  height: 24px;
+  background: #72cce8;
+  animation-delay: -4s;
+}
+
+.skinnySparkle {
+  position: absolute;
+  font-size: 2rem;
+  animation: skinnySparklePulse 2.5s ease-in-out infinite;
+}
+
+.skinnySparkleOne {
+  top: 21%;
+  left: 17%;
+}
+
+.skinnySparkleTwo {
+  right: 16%;
+  bottom: 20%;
+  animation-delay: -1.2s;
+}
+
+/* Lyrics drawer */
+
+.skinnyLyricsOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.skinnyLyricsDrawer {
+  position: relative;
+  width: 100%;
+  max-height: 88svh;
+  overflow-y: auto;
+  padding: 28px 24px 48px;
+  border-top: 7px solid #111111;
+  border-radius: 35px 35px 0 0;
+  background: #f080df;
+  box-shadow: 0 -10px 0 #111111;
+  text-align: center;
+  animation: skinnyDrawerUp 280ms ease both;
+}
+
+.skinnyLyricsClose {
+  position: absolute;
+  top: 17px;
+  right: 18px;
+  width: 44px;
+  height: 44px;
+  border: 5px solid #111111;
+  border-radius: 50%;
+  background: #bfd348;
+  box-shadow: 4px 4px 0 #111111;
+  font-size: 1.6rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.skinnyDrawerLogo {
+  display: block;
+  width: min(520px, 92vw);
+  height: auto;
+  margin: -38px auto -54px;
+}
+
+.skinnyLyricsDrawer h2 {
+  margin: 0 0 24px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.skinnyLyricsCopy {
+  width: min(600px, 100%);
+  margin: 0 auto;
+  padding: 28px 20px;
+  border: 5px solid #111111;
+  border-radius: 28px;
+  background: #f7f1e5;
+  box-shadow: 7px 7px 0 #111111;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.75;
+}
+
+.skinnyLyricsCopy p {
+  margin: 0;
+}
+
+.skinnyLyricsBreak {
+  height: 22px;
+}
+
+/* Animation */
+
+@keyframes skinnyDiscSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes skinnyStickerFloat {
+  from {
+    translate: 0 0;
+  }
+
+  to {
+    translate: 12px -16px;
+  }
+}
+
+@keyframes skinnyBubbleFloat {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-18px);
+  }
+}
+
+@keyframes skinnySparklePulse {
+  0%,
+  100% {
+    transform: scale(0.8) rotate(0deg);
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: scale(1.2) rotate(15deg);
+    opacity: 1;
+  }
+}
+
+@keyframes skinnyDrawerUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  .skinnyMainContent {
+    padding-top: 18px;
+  }
+
+  .skinnyMainLogo {
+    width: 126vw;
+    margin-bottom: -95px;
+    transform: translateX(-12px);
+  }
+
+  .skinnyDisc {
+    width: min(285px, 72vw);
+  }
+
+  .skinnyDiscControl {
+    width: 108px;
+    height: 108px;
+  }
+
+  .skinnyLyricSticker {
+    padding: 7px 10px;
+    border-width: 3px;
+    box-shadow: 3px 3px 0 #111111;
+    font-size: 0.56rem;
+  }
+
+  .skinnyStickerOne {
+    top: 12%;
+    left: 1%;
+  }
+
+  .skinnyStickerTwo {
+    top: 23%;
+    right: 1%;
+  }
+
+  .skinnyStickerThree {
+    bottom: 16%;
+    left: 1%;
+  }
+
+  .skinnyStickerFour {
+    right: 1%;
+    bottom: 10%;
+  }
+
+  .skinnyBubbleOne {
+    top: 9%;
+    right: 8%;
+  }
+
+  .skinnyBubbleTwo {
+    right: 3%;
+    bottom: 25%;
+  }
+
+  .skinnySparkleOne {
+    top: 19%;
+    left: 5%;
+  }
+
+  .skinnySparkleTwo {
+    right: 6%;
+    bottom: 18%;
+  }
+}
+
+@media (max-height: 760px) {
+  .skinnyMainLogo {
+    width: min(760px, 94vw);
+    margin-bottom: -88px;
+  }
+
+  .skinnyDisc {
+    width: min(245px, 58vw);
+  }
+
+  .skinnyDiscControl {
+    width: 94px;
+    height: 94px;
+  }
+
+  .skinnyProgressSection {
+    margin-top: 21px;
+  }
+
+  .skinnyLyricsButton {
+    margin-top: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skinnyDiscPlaying .skinnyDiscArtwork,
+  .skinnyLyricSticker,
+  .skinnyBubble,
+  .skinnySparkle,
+  .skinnyLyricsDrawer {
+    animation: none;
+  }
+}
