@@ -1,8 +1,9 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/cameras/checkin",
+      "destination": "/cameras/checkin.html"
     },
     {
       "source": "/cameras",
@@ -13,8 +14,8 @@
       "destination": "/cameras/index.html"
     },
     {
-      "source": "/cameras/checkin",
-      "destination": "/cameras/checkin.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
