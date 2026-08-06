@@ -3,6 +3,18 @@
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    },
+    {
+      "source": "/cameras",
+      "destination": "/cameras/index.html"
+    },
+    {
+      "source": "/cameras/",
+      "destination": "/cameras/index.html"
+    },
+    {
+      "source": "/cameras/checkin",
+      "destination": "/cameras/checkin.html"
     }
   ]
 }

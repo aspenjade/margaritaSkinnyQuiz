@@ -361,7 +361,7 @@ async function submitCheckin(cameraId, totalFrames) {
     statusEl.className = 'status-msg ok';
 
     setTimeout(() => {
-      window.location.href = `/cameras/index.html?cam=${encodeURIComponent(camSlug)}`;
+      window.location.href = `/cameras?cam=${encodeURIComponent(camSlug)}`;
     }, 1200);
 
     return;
@@ -429,7 +429,7 @@ async function submitCheckin(cameraId, totalFrames) {
     statusEl.className = 'status-msg ok';
 
     setTimeout(() => {
-      window.location.href = `/cameras/index.html?cam=${encodeURIComponent(camSlug)}`;
+      window.location.href = `/cameras?cam=${encodeURIComponent(camSlug)}`;
     }, 1400);
   } else {
     statusEl.textContent =
