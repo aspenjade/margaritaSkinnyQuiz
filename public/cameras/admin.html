@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Wandering Cameras</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="style.css">
+<style>
+  .cam-card { border: 2px solid var(--ink); background: rgba(255,255,255,0.3); border-radius: 3px; padding: 18px; margin-bottom: 20px; }
+  .cam-card h2 { font-family: var(--font-tag); margin-top:0; }
+  #pin-map { height: 260px; border: 2px solid var(--ink); border-radius: 2px; margin-top: 6px; }
+  .row { display:flex; gap:10px; }
+  .row > div { flex:1; }
+  .mini-btn { padding: 6px 10px; font-size: 11px; margin-top: 6px; }
+  .checkin-row { font-family: var(--font-ui); font-size: 12px; border-top: 1px dashed var(--ink-soft); padding: 6px 0; display:flex; justify-content:space-between; align-items:center; gap:8px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">wandering cameras · admin</span>
+</div>
+
+<div class="wrap">
+  <div id="login-box">
+    <label>Admin password</label>
+    <input type="password" id="pw-input">
+    <button onclick="tryLogin()">Enter</button>
+    <div id="login-status" class="status-msg err"></div>
+  </div>
+
+  <div id="admin-panel" style="display:none;"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+console.log('Leaflet loaded:', typeof L !== 'undefined');
+console.log('Supabase loaded:', typeof supabase !== 'undefined');
+console.log('Supabase URL:', window.SUPABASE_URL);
+console.log('Map center:', window.MAP_CENTER);
+console.log('Map zoom:', window.MAP_ZOOM);
+
+let sb = null;
+
+if (
+  typeof supabase !== 'undefined' &&
+  window.SUPABASE_URL &&
+  window.SUPABASE_ANON_KEY
+) {
+  sb = supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+  );
+} else {
+  console.error('Supabase configuration is missing.');
+}
+
+function tryLogin() {
+  const pw = document.getElementById('pw-input').value;
+  if (pw === window.ADMIN_PASSWORD) {
+    document.getElementById('login-box').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    loadAdmin();
+  } else {
+    document.getElementById('login-status').textContent = 'Wrong password.';
+  }
+}
+
+async function loadAdmin() {
+  const panel = document.getElementById('admin-panel');
+  panel.innerHTML = '<p class="qr-note">loading...</p>';
+
+  const { data: cameras } = await sb.from('cameras').select('*').order('slug');
+  const { data: checkins } = await sb.from('checkins').select('*').order('created_at', { ascending: false });
+
+  panel.innerHTML = cameras.map(cam => {
+    const camCheckins = checkins.filter(c => c.camera_id === cam.id).slice(0, 8);
+    return `
+      <div class="cam-card">
+        <h2>${escapeHtml(cam.name)} <span style="font-family:var(--font-ui); font-size:11px; color:var(--ink-soft);">/${cam.slug}</span></h2>
+
+        <label>Name</label>
+        <input type="text" id="name-${cam.id}" value="${escapeHtml(cam.name)}">
+
+        <label>Story</label>
+        <textarea id="story-${cam.id}" style="min-height:100px;">${escapeHtml(cam.story || '')}</textarea>
+
+        <div class="row">
+          <div>
+            <label>Total frames</label>
+            <input type="number" id="frames-${cam.id}" value="${cam.total_frames}">
+          </div>
+          <div>
+            <label>Location label</label>
+            <input type="text" id="loclabel-${cam.id}" value="${escapeHtml(cam.location_label || '')}">
+          </div>
+        </div>
+
+        <label>Today's location — click the map to set a pin (or edit lat/lng directly)</label>
+        <div class="row">
+          <div><input type="text" id="lat-${cam.id}" value="${cam.lat}"></div>
+          <div><input type="text" id="lng-${cam.id}" value="${cam.lng}"></div>
+        </div>
+        <div id="pin-map-${cam.id}" class="pin-map" style="height:220px; border:2px solid var(--ink); border-radius:2px; margin-top:8px;"></div>
+
+        <button onclick="saveCamera('${cam.id}')">Save camera</button>
+        <span id="save-status-${cam.id}" class="status-msg"></span>
+
+        <h3 style="font-family:var(--font-ui); font-size:12px; text-transform:uppercase; margin-top:22px;">Recent check-ins</h3>
+        ${camCheckins.length ? camCheckins.map(c => `
+          <div class="checkin-row">
+            <span>${new Date(c.created_at).toLocaleString()} — ${c.frames_remaining} left${c.finder_name ? ' — ' + escapeHtml(c.finder_name) : ''}${c.note ? ' — ' + escapeHtml(c.note) : ''}</span>
+            <button class="mini-btn secondary" onclick="deleteCheckin('${c.id}', '${cam.id}')">delete</button>
+          </div>`).join('') : '<p style="font-family:var(--font-ui); font-size:12px; color:var(--ink-soft);">None yet.</p>'}
+
+        <p style="font-family:var(--font-ui); font-size:11px; color:var(--ink-soft); margin-top:14px;">
+          QR code target: <code>checkin.html?cam=${cam.slug}</code><br>
+          Public view-only page: <code>index.html?cam=${cam.slug}</code>
+        </p>
+      </div>
+    `;
+  }).join('');
+
+  // init a small pin-setting map for each camera, after DOM is in place
+  cameras.forEach(cam => {
+    const m = L.map(`pin-map-${cam.id}`).setView([cam.lat, cam.lng], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(m);
+    const marker = L.marker([cam.lat, cam.lng], { draggable: true }).addTo(m);
+    marker.on('dragend', () => {
+      const pos = marker.getLatLng();
+      document.getElementById(`lat-${cam.id}`).value = pos.lat.toFixed(6);
+      document.getElementById(`lng-${cam.id}`).value = pos.lng.toFixed(6);
+    });
+    m.on('click', (e) => {
+      marker.setLatLng(e.latlng);
+      document.getElementById(`lat-${cam.id}`).value = e.latlng.lat.toFixed(6);
+      document.getElementById(`lng-${cam.id}`).value = e.latlng.lng.toFixed(6);
+    });
+  });
+}
+
+async function saveCamera(id) {
+  const statusEl = document.getElementById(`save-status-${id}`);
+  statusEl.textContent = 'saving...';
+  statusEl.className = 'status-msg';
+
+  const { error } = await sb.from('cameras').update({
+    name: document.getElementById(`name-${id}`).value.trim(),
+    story: document.getElementById(`story-${id}`).value.trim(),
+    total_frames: parseInt(document.getElementById(`frames-${id}`).value, 10),
+    location_label: document.getElementById(`loclabel-${id}`).value.trim(),
+    lat: parseFloat(document.getElementById(`lat-${id}`).value),
+    lng: parseFloat(document.getElementById(`lng-${id}`).value),
+    location_updated_at: new Date().toISOString()
+  }).eq('id', id);
+
+  if (error) {
+    statusEl.textContent = 'Error saving.';
+    statusEl.className = 'status-msg err';
+    console.error(error);
+    return;
+  }
+  statusEl.textContent = 'Saved.';
+  statusEl.className = 'status-msg ok';
+}
+
+async function deleteCheckin(checkinId, camId) {
+  if (!confirm('Delete this check-in?')) return;
+  await sb.from('checkins').delete().eq('id', checkinId);
+  loadAdmin();
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aspen Jade's Traveling Cameras — LA</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="map-view">
+  <img src="assets/logo-full.png" class="map-logo" alt="Aspen Jade Presents — Margarita Skinny Traveling Cameras" onerror="this.style.display='none'">
+  <div id="map-socials" class="map-socials"></div>
+  <div id="map"></div>
+</div>
+
+<div id="camera-view" class="wrap" style="display:none;"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script>
+const sb = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
+const params = new URLSearchParams(window.location.search);
+const camSlug = params.get('cam');
+
+if (camSlug) {
+  document.getElementById('map-view').style.display = 'none';
+  document.getElementById('camera-view').style.display = 'block';
+  loadCameraView(camSlug);
+} else {
+  loadMapView();
+  renderSocials();
+}
+
+function renderSocials() {
+  const el = document.getElementById('map-socials');
+  const links = (window.SOCIAL_LINKS || []).filter(s => s.url);
+  el.innerHTML = links.map(s => `<a href="${s.url}" target="_blank" rel="noopener">${escapeHtml(s.label)}</a>`).join('');
+}
+
+// Global so the inline onerror on each map pin image can call it reliably,
+// regardless of Leaflet's DOM render timing.
+window.handlePinError = function(imgEl) {
+  const wrap = imgEl.parentElement;
+  const bg = wrap.dataset.bg;
+  const text = wrap.dataset.text;
+  const name = wrap.dataset.name;
+  wrap.outerHTML = `<div class="tag-marker" style="background:${bg}; color:${text};">${name}</div>`;
+};
+
+async function loadMapView() {
+  console.log('loadMapView started');
+  const map = L.map('map').setView(window.MAP_CENTER, window.MAP_ZOOM);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    maxZoom: 19,
+    subdomains: 'abcd'
+  }).addTo(map);
+
+  const { data: cameras, error } = await sb.from('cameras').select('*');
+  console.log('cameras:', cameras);
+  console.log('error:', error);
+  if (error) { console.error(error); return; }
+
+  cameras.forEach(cam => {
+    console.log(cam.name, cam.lat, cam.lng, `assets/map/${cam.slug}.png`);
+
+    const recentlyUpdated = (Date.now() - new Date(cam.location_updated_at).getTime()) < 1000*60*60*36;
+    const theme = getTheme(cam.name);
+    const bg = recentlyUpdated ? '#CFF3D8' : theme.tagBg;
+    const icon = L.divIcon({
+      className: 'camera-map-icon',
+      html: `
+        <div
+          class="tag-marker-wrap"
+          data-bg="${bg}"
+          data-text="${theme.tagText}"
+          data-name="${escapeHtml(cam.name)}"
+        >
+          <img
+            class="tag-marker-img"
+            src="assets/map/${cam.slug}.png"
+            alt="${escapeHtml(cam.name)}"
+            onerror="window.handlePinError(this)"
+          >
+        </div>
+      `,
+      iconSize: [120, 50],
+      iconAnchor: [60, 25]
+    });
+    const marker = L.marker([cam.lat, cam.lng], { icon }).addTo(map);
+    marker.on('click', () => { window.location.href = `index.html?cam=${cam.slug}`; });
+    marker.bindPopup(`<b>${escapeHtml(cam.name)}</b><br>${escapeHtml(cam.location_label || '')}<br><a href="index.html?cam=${cam.slug}">view camera →</a>`);
+  });
+}
+
+async function loadCameraView(slug) {
+  const view = document.getElementById('camera-view');
+  view.innerHTML = `<p class="qr-note">loading camera...</p>`;
+
+  const { data: cam, error } = await sb.from('cameras').select('*').eq('slug', slug).single();
+  if (error || !cam) {
+    view.innerHTML = `<a href="index.html" class="back-link">← back to map</a><p>Camera not found.</p>`;
+    return;
+  }
+
+  const theme = getTheme(cam.name);
+  document.body.classList.add(theme.bodyClass);
+
+  const { data: checkins } = await sb
+    .from('checkins')
+    .select('*')
+    .eq('camera_id', cam.id)
+    .order('created_at', { ascending: false });
+
+  const { data: media } = await sb
+    .from('media')
+    .select('*')
+    .eq('camera_id', cam.id)
+    .order('created_at', { ascending: false });
+
+  const latestFramesRemaining = checkins && checkins.length ? checkins[0].frames_remaining : cam.total_frames;
+  const pctUsed = Math.round(((cam.total_frames - latestFramesRemaining) / cam.total_frames) * 100);
+
+  view.innerHTML = `
+    <a href="index.html" class="back-link">← back to map</a>
+    <div class="you-got">You're tracking Aspen Jade's traveling...</div>
+    <div class="title-pill-wrap"><div class="title-pill"><h1 class="camera-title"><img src="assets/cameras/${cam.slug}.png" class="badge-img" alt="${escapeHtml(cam.name)}" onerror="this.replaceWith(Object.assign(document.createElement('span'), {textContent: this.alt}))"></h1></div></div>
+    <div class="location-stamp">last spotted: ${escapeHtml(cam.location_label || 'unknown')}</div>
+
+    <div class="story">${escapeHtml(cam.story || 'This camera doesn\'t have a story yet — maybe you\'re about to help write it.')}</div>
+
+    <div class="counter-block">
+      <div class="counter-number">
+        <span class="n">${latestFramesRemaining}</span>
+        <span class="lbl">frames left</span>
+      </div>
+      <div class="counter-text">
+        <b>${pctUsed}%</b> of the film used<br>
+        ${checkins ? checkins.length : 0} check-in${checkins && checkins.length===1?'':'s'} so far
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>Camera History Log :)</h2>
+      <div id="trail">${renderTrail(checkins || [], media || [])}</div>
+    </section>
+
+    <p class="qr-note">Find this camera in real life? Scan the QR code on it to check in.</p>
+    <p class="qr-note">Aspen Jade's Traveling Cameras · los angeles</p>
+  `;
+}
+</script>
+</body>
+</html>

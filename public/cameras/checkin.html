@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check In — Aspen Jade's Traveling Cameras</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="camera-view" class="wrap"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="shared.js"></script>
+
+<script>
+console.log('Supabase loaded:', typeof supabase !== 'undefined');
+console.log('Supabase URL:', window.SUPABASE_URL);
+
+let sb = null;
+
+if (
+  typeof supabase !== 'undefined' &&
+  window.SUPABASE_URL &&
+  window.SUPABASE_ANON_KEY
+) {
+  sb = supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+  );
+} else {
+  console.error('Supabase configuration is missing.');
+}
+
+const MAX_FILES = 5;
+const MAX_IMAGE_SIZE = 15 * 1024 * 1024;
+const MAX_TOTAL_SIZE = 75 * 1024 * 1024;
+
+const params = new URLSearchParams(window.location.search);
+const camSlug = params.get('cam');
+
+if (!sb) {
+  document.getElementById('camera-view').innerHTML = `
+    <p class="qr-note">Unable to connect to the camera database.</p>
+  `;
+} else if (camSlug) {
+  loadCheckinView(camSlug);
+} else {
+  document.getElementById('camera-view').innerHTML = `
+    <p class="qr-note">
+      No camera specified. This page needs a link like
+      checkin.html?cam=camera-1.
+    </p>
+  `;
+}
+
+async function loadCheckinView(slug) {
+  const view = document.getElementById('camera-view');
+
+  view.innerHTML = `
+    <p class="qr-note">loading camera...</p>
+  `;
+
+  const { data: cam, error } = await sb
+    .from('cameras')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error || !cam) {
+    view.innerHTML = `<p>Camera not found.</p>`;
+    return;
+  }
+
+  const theme = getTheme(cam.name);
+  document.body.classList.add(theme.bodyClass);
+
+  const { data: checkins } = await sb
+    .from('checkins')
+    .select('*')
+    .eq('camera_id', cam.id)
+    .order('created_at', { ascending: false });
+
+  const { data: media } = await sb
+    .from('media')
+    .select('*')
+    .eq('camera_id', cam.id)
+    .order('created_at', { ascending: false });
+
+  const latestFramesRemaining =
+    checkins && checkins.length
+      ? checkins[0].frames_remaining
+      : cam.total_frames;
+
+  const pctUsed = Math.round(
+    ((cam.total_frames - latestFramesRemaining) / cam.total_frames) * 100
+  );
+
+  view.innerHTML = `
+    <div class="you-got">
+      omg you found Aspen Jade's traveling...
+    </div>
+
+    <div class="title-pill-wrap">
+      <div class="title-pill">
+        <h1 class="camera-title">
+          <img
+            src="assets/cameras/${cam.slug}.png"
+            class="badge-img"
+            alt="${escapeHtml(cam.name)}"
+            onerror="this.replaceWith(Object.assign(document.createElement('span'), {textContent: this.alt}))"
+          >
+        </h1>
+      </div>
+    </div>
+
+    <div class="location-stamp">
+      last spotted: ${escapeHtml(cam.location_label || 'unknown')}
+    </div>
+
+    <section class="panel">
+      <h2>You found it! 📸</h2>
+
+      <p style="
+        font-family: var(--font-ui);
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0 0 14px;
+        color: var(--ink);
+      ">
+        This disposable camera is traveling around Los Angeles as part of my song, Margarita Skinny.
+        Thanks so much for becoming part of its story 💕 
+        There's an AirTag traveling with it too, so we can watch where it ends up!
+        - Aspen Jade
+      </p>
+
+      <div style="
+        background: var(--pink-soft);
+        border: 2px solid var(--ink);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+      ">
+        <div style="
+          font-family: var(--font-display);
+          font-size: 15px;
+          font-weight: 700;
+          margin-bottom: 10px;
+        ">
+          What to do:
+        </div>
+
+        <ol style="
+          font-family: var(--font-ui);
+          font-size: 13px;
+          line-height: 1.6;
+          margin: 0;
+          padding-left: 36px;
+        ">
+          <li><b>Take one photo :)</b></li>
+          <li>Use the form below to "check-in" with the camera (let me know how many pictures are left too)</li>
+          <li>Keep it moving! Take it somewhere new and leave it for someone else to discover.</li>
+          <li>Follow @aspenjade.vox to see the developed photos and where the camera travels next..</li>
+        </ol>
+      </div>
+
+      <p style="
+        font-family: var(--font-ui);
+        font-size: 12px;
+        line-height: 1.5;
+        margin: 0;
+        color: var(--teal-deep);
+        font-weight: 700;
+      ">
+        Every new person becomes part of the story. Please help the camera keep traveling..
+      </p>
+    </section>
+
+    <div class="story">
+      ${escapeHtml(
+        cam.story ||
+        'This camera doesn\'t have a story yet — maybe you\'re about to help write it.'
+      )}
+    </div>
+
+    <div class="counter-block">
+      <div class="counter-number">
+        <span class="n">${latestFramesRemaining}</span>
+        <span class="lbl">frames left</span>
+      </div>
+
+      <div class="counter-text">
+        <b>${pctUsed}%</b> of the film used<br>
+        ${checkins ? checkins.length : 0}
+        check-in${checkins && checkins.length === 1 ? '' : 's'} so far
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>Check in</h2>
+
+      <p style="
+        font-family: var(--font-ui);
+        font-size: 12px;
+        color: var(--ink);
+        margin-top: -6px;
+      ">
+        Tell us how many frames are left — and share a photo or video if
+        you've got one.
+      </p>
+
+      <label>Frames remaining</label>
+      <input
+        type="number"
+        id="ci-frames"
+        min="0"
+        max="${cam.total_frames}"
+        value="${latestFramesRemaining}"
+      >
+
+      <label>Your name or handle (optional)</label>
+      <input
+        type="text"
+        id="ci-name"
+        placeholder="first name or @handle"
+      >
+
+      <label>Where is the camera now? (optional)</label>
+      <textarea
+        id="ci-note"
+        placeholder="where'd you find it? what happened?"
+      ></textarea>
+
+      <label>Share a photo! (optional — take a selfie with the camera or a picture of where you found it)</label>
+      <input
+        type="file"
+        id="ci-files"
+        accept="image/*"
+        multiple
+      >
+
+      <div id="ci-files-hint" class="status-msg"></div>
+
+      <button onclick="submitCheckin('${cam.id}', ${cam.total_frames})">
+        Submit check-in
+      </button>
+
+      <div id="ci-status" class="status-msg"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Camera History Log :)</h2>
+      <div id="trail">
+        ${renderTrail(checkins || [], media || [])}
+      </div>
+    </section>
+
+    <p class="qr-note">
+      Aspen Jade's Traveling Cameras · Los Angeles
+    </p>
+  `;
+}
+
+document.addEventListener('change', (e) => {
+  if (e.target && e.target.id === 'ci-files') {
+    const hint = document.getElementById('ci-files-hint');
+
+    if (e.target.files.length > MAX_FILES) {
+      hint.textContent =
+        `Max ${MAX_FILES} files — only the first ${MAX_FILES} will be uploaded.`;
+      hint.className = 'status-msg err';
+    } else if (e.target.files.length > 0) {
+      hint.textContent =
+        `${e.target.files.length} file${e.target.files.length === 1 ? '' : 's'} selected.`;
+      hint.className = 'status-msg ok';
+    } else {
+      hint.textContent = '';
+    }
+  }
+});
+
+async function submitCheckin(cameraId, totalFrames) {
+  const frames = parseInt(
+    document.getElementById('ci-frames').value,
+    10
+  );
+
+  const name = document
+    .getElementById('ci-name')
+    .value
+    .trim();
+
+  const note = document
+    .getElementById('ci-note')
+    .value
+    .trim();
+
+  const fileInput = document.getElementById('ci-files');
+  const statusEl = document.getElementById('ci-status');
+  const files = Array.from(fileInput.files).slice(0, MAX_FILES);
+
+  const oversizedFile = files.find(
+  (file) => file.size > MAX_IMAGE_SIZE
+  );
+
+  if (oversizedFile) {
+    statusEl.textContent =
+      `"${oversizedFile.name}" is too large. Photos must be under 15 MB.`;
+
+    statusEl.className = 'status-msg err';
+    return;
+  }
+
+  const totalSize = files.reduce(
+    (sum, file) => sum + file.size,
+    0
+  );
+
+  if (totalSize > MAX_TOTAL_SIZE) {
+    statusEl.textContent =
+      'Your selected files are over 100 MB total. Please choose fewer or smaller files.';
+
+    statusEl.className = 'status-msg err';
+    return;
+  }
+
+  if (isNaN(frames) || frames < 0 || frames > totalFrames) {
+    statusEl.textContent =
+      `Enter a number between 0 and ${totalFrames}.`;
+    statusEl.className = 'status-msg err';
+    return;
+  }
+
+  statusEl.textContent = 'Submitting check-in...';
+  statusEl.className = 'status-msg';
+
+  const { data: checkin, error } = await sb
+    .from('checkins')
+    .insert({
+      camera_id: cameraId,
+      frames_remaining: frames,
+      note: note,
+      finder_name: name
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+
+    statusEl.textContent =
+      'Something went wrong. Please try again.';
+    statusEl.className = 'status-msg err';
+    return;
+  }
+
+  if (files.length === 0) {
+    statusEl.textContent =
+      'Check-in saved. Thank you! 💕';
+
+    statusEl.className = 'status-msg ok';
+
+    setTimeout(() => {
+      window.location.href = `/cameras/index.html?cam=${encodeURIComponent(camSlug)}`;
+    }, 1200);
+
+    return;
+  }
+
+  let uploaded = 0;
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
+    statusEl.textContent =
+      `Uploading ${i + 1} of ${files.length}...`;
+
+    const ext = file.name.split('.').pop() || 'file';
+    const path = `${cameraId}/${Date.now()}-${i}.${ext}`;
+
+    const { error: uploadError } = await sb
+      .storage
+      .from('camera-media')
+      .upload(path, file);
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+
+      statusEl.textContent =
+        `Check-in saved, but the file failed to upload: ${uploadError.message}`;
+
+      statusEl.className = 'status-msg err';
+      continue;
+    }
+
+    const { data: urlData } = sb
+      .storage
+      .from('camera-media')
+      .getPublicUrl(path);
+
+    const mediaType = 'image';
+
+    const { error: insertError } = await sb
+      .from('media')
+      .insert({
+        camera_id: cameraId,
+        checkin_id: checkin.id,
+        file_url: urlData.publicUrl,
+        media_type: mediaType
+      });
+
+    if (insertError) {
+      console.error('Media insert error:', insertError);
+
+      statusEl.textContent =
+        `File uploaded, but it could not be added to the camera log: ${insertError.message}`;
+
+      statusEl.className = 'status-msg err';
+      continue;
+    }
+
+    uploaded++;
+  }
+
+  if (uploaded === files.length) {
+    statusEl.textContent =
+      'Check-in saved. Thank you! Keep the camera moving 💕';
+
+    statusEl.className = 'status-msg ok';
+
+    setTimeout(() => {
+      window.location.href = `/cameras/index.html?cam=${encodeURIComponent(camSlug)}`;
+    }, 1400);
+  } else {
+    statusEl.textContent =
+      `Check-in saved. ${uploaded} of ${files.length} files uploaded.`;
+
+    statusEl.className = 'status-msg err';
+  }
+}
+</script>
+
+</body>
+</html>
