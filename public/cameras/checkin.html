@@ -177,12 +177,11 @@ async function loadCheckinView(slug) {
       </p>
     </section>
 
-    <div class="story">
-      ${escapeHtml(
-        cam.story ||
-        'This camera doesn\'t have a story yet — maybe you\'re about to help write it.'
-      )}
-    </div>
+    ${cam.story ? `
+  <div class="story">
+    ${escapeHtml(cam.story)}
+  </div>
+` : ''}
 
     <div class="counter-block">
       <div class="counter-number">

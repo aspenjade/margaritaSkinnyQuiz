@@ -132,7 +132,7 @@ async function loadCameraView(slug) {
     <div class="title-pill-wrap"><div class="title-pill"><h1 class="camera-title"><img src="assets/cameras/${cam.slug}.png" class="badge-img" alt="${escapeHtml(cam.name)}" onerror="this.replaceWith(Object.assign(document.createElement('span'), {textContent: this.alt}))"></h1></div></div>
     <div class="location-stamp">last spotted: ${escapeHtml(cam.location_label || 'unknown')}</div>
 
-    <div class="story">${escapeHtml(cam.story || 'This camera doesn\'t have a story yet — maybe you\'re about to help write it.')}</div>
+    // <div class="story">${escapeHtml(cam.story || 'This camera doesn\'t have a story yet — maybe you\'re about to help write it.')}</div>
 
     <div class="counter-block">
       <div class="counter-number">
