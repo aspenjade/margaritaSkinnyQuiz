@@ -331,7 +331,7 @@ async function submitCheckin(cameraId, totalFrames) {
     return;
   }
 
-  statusEl.textContent = 'Submitting check-in...';
+  statusEl.textContent = 'Submitting check-in...please be patient :)';
   statusEl.className = 'status-msg';
 
   const { data: checkin, error } = await sb
