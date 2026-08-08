@@ -292,7 +292,7 @@ export default function QuizPage() {
                 Start quiz
               </button>
             </motion.section>
-          ) : isFinished && !showResult ? (
+          ) : false && isFinished && !showResult ? (
   <motion.section
     key="presave"
     className="screen result"
