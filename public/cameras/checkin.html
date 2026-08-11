@@ -35,7 +35,7 @@ if (
 
 const MAX_FILES = 5;
 const MAX_IMAGE_SIZE = 15 * 1024 * 1024;
-const MAX_TOTAL_SIZE = 75 * 1024 * 1024;
+const MAX_TOTAL_SIZE = 100 * 1024 * 1024;
 
 const params = new URLSearchParams(window.location.search);
 const camSlug = params.get('cam');
@@ -129,9 +129,9 @@ async function loadCheckinView(slug) {
         margin: 0 0 14px;
         color: var(--ink);
       ">
-        This disposable camera is traveling around Los Angeles as part of my song, Margarita Skinny.
+        This camera is traveling around Los Angeles as part of @aspenjade.vox NEW SONG, Margarita Skinny.
         Thanks so much for becoming part of its story 💕 
-        There's an AirTag traveling with it too, so we can watch where it ends up!
+        There's an AirTag traveling with it too, so we can watch where it ends up! Follow the instructions below and TAG ME IN YOUR IG STORIES!
         - Aspen Jade
       </p>
 
@@ -161,7 +161,7 @@ async function loadCheckinView(slug) {
           <li><b>Take one photo :)</b></li>
           <li>Use the form below to "check-in" with the camera (let me know how many pictures are left too)</li>
           <li>Keep it moving! Take it somewhere new and leave it for someone else to discover.</li>
-          <li>Follow @aspenjade.vox to see the developed photos and where the camera travels next..</li>
+          <li>Follow @aspenjade.vox to see the developed photos :)</li>
         </ol>
       </div>
 
@@ -176,12 +176,6 @@ async function loadCheckinView(slug) {
         Every new person becomes part of the story. Please help the camera keep traveling..
       </p>
     </section>
-
-    ${cam.story ? `
-  <div class="story">
-    ${escapeHtml(cam.story)}
-  </div>
-` : ''}
 
     <div class="counter-block">
       <div class="counter-number">
@@ -216,27 +210,33 @@ async function loadCheckinView(slug) {
         min="0"
         max="${cam.total_frames}"
         value="${latestFramesRemaining}"
+        required
       >
 
-      <label>Your name or handle (optional)</label>
+      <label>Your name or handle</label>
       <input
         type="text"
         id="ci-name"
         placeholder="first name or @handle"
+        required
       >
 
-      <label>Where is the camera now? (optional)</label>
+      <label>Where is the camera now?</label>
       <textarea
         id="ci-note"
         placeholder="where'd you find it? what happened?"
+        required
       ></textarea>
 
-      <label>Share a photo! (optional — take a selfie with the camera or a picture of where you found it)</label>
+      <label>
+        Share a photo! (take a selfie with the camera or a picture of where you found it)
+      </label>
       <input
         type="file"
         id="ci-files"
         accept="image/*"
         multiple
+        required
       >
 
       <div id="ci-files-hint" class="status-msg"></div>
@@ -299,8 +299,26 @@ async function submitCheckin(cameraId, totalFrames) {
   const statusEl = document.getElementById('ci-status');
   const files = Array.from(fileInput.files).slice(0, MAX_FILES);
 
+  if (!name) {
+    statusEl.textContent = 'Please enter your name or @handle.';
+    statusEl.className = 'status-msg err';
+    return;
+  }
+
+  if (!note) {
+    statusEl.textContent = 'Please tell us where the camera is now.';
+    statusEl.className = 'status-msg err';
+    return;
+  }
+
+  if (files.length === 0) {
+    statusEl.textContent = 'Please upload a photo before checking in.';
+    statusEl.className = 'status-msg err';
+    return;
+  }
+
   const oversizedFile = files.find(
-  (file) => file.size > MAX_IMAGE_SIZE
+    (file) => file.size > MAX_IMAGE_SIZE
   );
 
   if (oversizedFile) {
@@ -351,19 +369,6 @@ async function submitCheckin(cameraId, totalFrames) {
     statusEl.textContent =
       'Something went wrong. Please try again.';
     statusEl.className = 'status-msg err';
-    return;
-  }
-
-  if (files.length === 0) {
-    statusEl.textContent =
-      'Check-in saved. Thank you! 💕';
-
-    statusEl.className = 'status-msg ok';
-
-    setTimeout(() => {
-      window.location.href = `/cameras/index.html?cam=${encodeURIComponent(camSlug)}`;
-    }, 1200);
-
     return;
   }
 
@@ -423,14 +428,48 @@ async function submitCheckin(cameraId, totalFrames) {
   }
 
   if (uploaded === files.length) {
-    statusEl.textContent =
-      'Check-in saved. Thank you! Keep the camera moving 💕';
+    statusEl.innerHTML = `
+      <div style="
+        margin-top: 16px;
+        text-align: center;
+        line-height: 1.6;
+      ">
+        <div style="
+          font-family: var(--font-display);
+          font-size: 18px;
+          font-weight: 800;
+          margin-bottom: 8px;
+        ">
+          Check-in saved! 💕
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          Follow <b>@aspenjade.vox</b> to see how your photos ended up 📸
+        </div>
+
+        <a
+          href="https://instagram.com/aspenjade.vox"
+          target="_blank"
+          rel="noopener"
+          style="
+            display: inline-block;
+            padding: 12px 18px;
+            background: var(--pink);
+            color: var(--white);
+            border: 2px solid var(--ink);
+            border-radius: 999px;
+            box-shadow: 3px 3px 0 var(--ink);
+            font-family: var(--font-display);
+            font-weight: 800;
+            text-decoration: none;
+          "
+        >
+          Follow @aspenjade.vox →
+        </a>
+      </div>
+    `;
 
     statusEl.className = 'status-msg ok';
-
-    setTimeout(() => {
-      window.location.href = `/cameras/index.html?cam=${encodeURIComponent(camSlug)}`;
-    }, 1400);
   } else {
     statusEl.textContent =
       `Check-in saved. ${uploaded} of ${files.length} files uploaded.`;
