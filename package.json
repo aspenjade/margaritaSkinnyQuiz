@@ -7,6 +7,7 @@
   "dependencies": {
     "@vitejs/plugin-react": "latest",
     "framer-motion": "latest",
+    "qrcode": "^1.5.4",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "^7.18.1",
@@ -19,5 +20,8 @@
     "eslint-plugin-react-refresh": "latest",
     "globals": "latest"
   },
-  "dependenciesMeta": {}
+  "dependenciesMeta": {},
+  "allowScripts": {
+    "fsevents@2.3.3": true
+  }
 }
