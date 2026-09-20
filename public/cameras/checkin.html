@@ -76,6 +76,44 @@ async function loadCheckinView(slug) {
   const theme = getTheme(cam.name);
   document.body.classList.add(theme.bodyClass);
 
+  let cameraNote;
+
+if (cam.slug === 'camera-6') {
+  cameraNote = `
+    This camera is traveling around UCLA as part of @aspenjade.vox NEW SONG, Margarita Skinny.
+    Thanks so much for becoming part of its story 💕
+    There's an AirTag traveling with it too, so we can watch where it ends up!
+    Please keep this camera on UCLA's campus, follow the instructions below, and TAG ME IN YOUR IG STORIES!
+    - Aspen Jade
+  `;
+  moveInstruction = `
+    Keep it moving around UCLA! Take it somewhere new on campus and leave it for another Bruin to discover.
+  `;
+} else if (cam.slug === 'camera-5') {
+  cameraNote = `
+    This camera is traveling around USC as part of @aspenjade.vox NEW SONG, Margarita Skinny.
+    Thanks so much for becoming part of its story 💕
+    There's an AirTag traveling with it too, so we can watch where it ends up!
+    Please keep this camera on USC's campus, follow the instructions below, and TAG ME IN YOUR IG STORIES!
+    - Aspen Jade
+  `;
+  moveInstruction = `
+    Keep it moving around USC! Take it somewhere new on campus and leave it for another Trojan to discover.
+  `;
+
+} else {
+  cameraNote = `
+    This camera is traveling around Los Angeles as part of @aspenjade.vox NEW SONG, Margarita Skinny.
+    Thanks so much for becoming part of its story 💕
+    There's an AirTag traveling with it too, so we can watch where it ends up!
+    Follow the instructions below and TAG ME IN YOUR IG STORIES!
+    - Aspen Jade
+  `;
+  moveInstruction = `
+    Keep it moving! Take it somewhere new and leave it for someone else to discover.
+  `;
+}
+
   const { data: checkins } = await sb
     .from('checkins')
     .select('*')
@@ -129,10 +167,7 @@ async function loadCheckinView(slug) {
         margin: 0 0 14px;
         color: var(--ink);
       ">
-        This camera is traveling around Los Angeles as part of @aspenjade.vox NEW SONG, Margarita Skinny.
-        Thanks so much for becoming part of its story 💕 
-        There's an AirTag traveling with it too, so we can watch where it ends up! Follow the instructions below and TAG ME IN YOUR IG STORIES!
-        - Aspen Jade
+        <li>${cameraNote}</li>
       </p>
 
       <div style="
@@ -160,7 +195,7 @@ async function loadCheckinView(slug) {
         ">
           <li><b>Take one photo :)</b></li>
           <li>Use the form below to "check-in" with the camera (let me know how many pictures are left too)</li>
-          <li>Keep it moving! Take it somewhere new and leave it for someone else to discover.</li>
+          <li>${moveInstruction}</li>
           <li>Follow @aspenjade.vox to see the developed photos :)</li>
         </ol>
       </div>

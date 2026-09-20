@@ -52,14 +52,36 @@ window.handlePinError = function(imgEl) {
   wrap.outerHTML = `<div class="tag-marker" style="background:${bg}; color:${text};">${name}</div>`;
 };
 
+function timeAgo(dateString) {
+  if (!dateString) return 'location unknown';
+
+  const updated = new Date(dateString);
+  if (Number.isNaN(updated.getTime())) return 'location unknown';
+
+  const seconds = Math.max(
+    0,
+    Math.floor((Date.now() - updated.getTime()) / 1000)
+  );
+
+  if (seconds < 60) return 'updated just now';
+
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `updated ${minutes}m ago`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `updated ${hours}h ago`;
+
+  const days = Math.floor(hours / 24);
+  return `last seen ${days}d ago`;
+}
+
 async function loadMapView() {
   console.log('loadMapView started');
   const map = L.map('map').setView(window.MAP_CENTER, window.MAP_ZOOM);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    maxZoom: 19,
-    subdomains: 'abcd'
-  }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_3r1q_1_375f684f798d258935590bd0', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd', maxZoom: 20
+}).addTo(map);
 
   const { data: cameras, error } = await sb.from('cameras').select('*');
   console.log('cameras:', cameras);
@@ -73,25 +95,31 @@ async function loadMapView() {
     const theme = getTheme(cam.name);
     const bg = recentlyUpdated ? '#CFF3D8' : theme.tagBg;
     const icon = L.divIcon({
-      className: 'camera-map-icon',
-      html: `
-        <div
-          class="tag-marker-wrap"
-          data-bg="${bg}"
-          data-text="${theme.tagText}"
-          data-name="${escapeHtml(cam.name)}"
+  className: 'camera-map-icon',
+  html: `
+    <div class="map-camera-marker">
+      <div
+        class="tag-marker-wrap"
+        data-bg="${bg}"
+        data-text="${theme.tagText}"
+        data-name="${escapeHtml(cam.name)}"
+      >
+        <img
+          class="tag-marker-img"
+          src="assets/map/${cam.slug}.png"
+          alt="${escapeHtml(cam.name)}"
+          onerror="window.handlePinError(this)"
         >
-          <img
-            class="tag-marker-img"
-            src="assets/map/${cam.slug}.png"
-            alt="${escapeHtml(cam.name)}"
-            onerror="window.handlePinError(this)"
-          >
-        </div>
-      `,
-      iconSize: [120, 50],
-      iconAnchor: [60, 25]
-    });
+      </div>
+
+      <div class="map-last-updated">
+        ${timeAgo(cam.location_updated_at)}
+      </div>
+    </div>
+  `,
+  iconSize: [140, 70],
+  iconAnchor: [70, 35]
+});
     const marker = L.marker([cam.lat, cam.lng], { icon }).addTo(map);
     marker.on('click', () => { window.location.href = `index.html?cam=${cam.slug}`; });
     marker.bindPopup(`<b>${escapeHtml(cam.name)}</b><br>${escapeHtml(cam.location_label || '')}<br><a href="index.html?cam=${cam.slug}">view camera →</a>`);

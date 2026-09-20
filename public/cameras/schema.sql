@@ -70,7 +70,9 @@ values
   ('camera-1', 'Margarita Skinny Cam', 27, 'Los Angeles, CA'),
   ('camera-2', 'Margarita Spicy Cam', 27, 'Los Angeles, CA'),
   ('camera-3', 'Margarita Strawberry Cam', 27, 'Los Angeles, CA'),
-  ('camera-4', 'Margarita Salty Cam', 27, 'Los Angeles, CA')
+  ('camera-4', 'Margarita Salty Cam', 27, 'Los Angeles, CA'),
+  ('camera-5', 'UCLA Cam', 27, 'Los Angeles, CA'),
+  ('camera-5', 'USC Cam', 27, 'Los Angeles, CA'),
 on conflict (slug) do nothing;
 
 

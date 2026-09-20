@@ -97,6 +97,30 @@ a { color: inherit; }
 }
 
 
+.map-camera-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 140px;
+}
+
+.map-last-updated {
+  margin-top: 3px;
+  padding: 2px 7px;
+
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 10px;
+
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+
+  color: #14181B;
+
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
 .map-socials {
   position: absolute;
   top: 18px;
