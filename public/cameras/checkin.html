@@ -79,24 +79,22 @@ async function loadCheckinView(slug) {
   let cameraNote;
 
 if (cam.slug === 'camera-6') {
-  cameraNote = `
-    This camera is traveling around UCLA as part of @aspenjade.vox NEW SONG, Margarita Skinny.
-    Thanks so much for becoming part of its story 💕
-    There's an AirTag traveling with it too, so we can watch where it ends up!
-    Please keep this camera on UCLA's campus, follow the instructions below, and TAG ME IN YOUR IG STORIES!
-    - Aspen Jade
-  `;
+  cameraNote = `This camera is traveling around UCLA as part of @aspenjade.vox's new song, Margarita Skinny 💕 There's an AirTag traveling with it too, so we can watch where it ends up! Please keep it on UCLA's campus + TAG ME IN YOUR IG STORIES @aspenjade.vox!
+
+🚨 UCLA VS. USC 🚨
+There’s a competing camera at USC. Let’s see which school fills theirs first 👀
+
+Follow the instructions below, then keep the camera moving around campus!`;
   moveInstruction = `
     Keep it moving around UCLA! Take it somewhere new on campus and leave it for another Bruin to discover.
   `;
 } else if (cam.slug === 'camera-5') {
-  cameraNote = `
-    This camera is traveling around USC as part of @aspenjade.vox NEW SONG, Margarita Skinny.
-    Thanks so much for becoming part of its story 💕
-    There's an AirTag traveling with it too, so we can watch where it ends up!
-    Please keep this camera on USC's campus, follow the instructions below, and TAG ME IN YOUR IG STORIES!
-    - Aspen Jade
-  `;
+  cameraNote = `This camera is traveling around USC as part of @aspenjade.vox's new song, Margarita Skinny 💕 There's an AirTag traveling with it too, so we can watch where it ends up! Please keep it on USC's campus + TAG ME IN YOUR IG STORIES @aspenjade.vox!
+
+🚨 USC VS. UCLA 🚨
+There’s a competing camera at UCLA. Let’s see which school fills theirs first 👀
+
+Follow the instructions below, then keep the camera moving around campus!`;
   moveInstruction = `
     Keep it moving around USC! Take it somewhere new on campus and leave it for another Trojan to discover.
   `;
@@ -106,7 +104,7 @@ if (cam.slug === 'camera-6') {
     This camera is traveling around Los Angeles as part of @aspenjade.vox NEW SONG, Margarita Skinny.
     Thanks so much for becoming part of its story 💕
     There's an AirTag traveling with it too, so we can watch where it ends up!
-    Follow the instructions below and TAG ME IN YOUR IG STORIES!
+    Follow the instructions below and TAG ME IN YOUR IG STORIES @aspenjade.vox!
     - Aspen Jade
   `;
   moveInstruction = `
@@ -160,15 +158,9 @@ if (cam.slug === 'camera-6') {
     <section class="panel">
       <h2>You found it! 📸</h2>
 
-      <p style="
-        font-family: var(--font-ui);
-        font-size: 14px;
-        line-height: 1.6;
-        margin: 0 0 14px;
-        color: var(--ink);
-      ">
-        <li>${cameraNote}</li>
-      </p>
+      <div class="camera-note">
+        ${cameraNote}
+      </div>
 
       <div style="
         background: var(--pink-soft);

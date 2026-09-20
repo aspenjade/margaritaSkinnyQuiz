@@ -316,6 +316,7 @@ a { color: inherit; }
 }
 
 .story {
+  white-space: pre-line;
   font-family: var(--font-ui);
   font-weight: 500;
   font-size: 15px;
@@ -367,6 +368,15 @@ a { color: inherit; }
   color: var(--white);
 }
 .counter-text b { color: var(--pink-soft); }
+
+.camera-note {
+  white-space: pre-line;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 14px;
+  color: var(--ink);
+}
 
 section.panel {
   border: 3px solid var(--ink);
@@ -466,4 +476,14 @@ button:disabled { opacity: 0.5; cursor: default; }
 @media (max-width: 480px) {
   .camera-title { font-size: 26px; }
   .title-pill { padding: 8px 22px 12px; }
+}
+
+.panel h2 {
+  margin: 0 0 4px 0 !important;
+}
+
+.camera-note {
+  white-space: pre-line;
+  margin: 0 !important;
+  padding: 0 !important;
 }
